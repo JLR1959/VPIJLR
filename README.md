@@ -1,30 +1,36 @@
 # VPIJLR
 
-Logiciel de gestion clients et notes.
+Logiciel de gestion clients et notes développé en HTML et JavaScript.
+
+Ce logiciel fonctionne directement dans le navigateur sans installation.
+
+---
 
 ## Fonctionnalités
 
 - Gestion des clients
-- Gestion des notes
+- Création et gestion des notes
 - Signature
 - Horloges
 - Export PDF
-- Système de licence
+- Sauvegarde locale (IndexedDB)
+- Système de licence intégré
+
+---
 
 ## Installation
 
-1. Télécharger le projet
-2. Décompresser le dossier
+1. Télécharger le projet depuis GitHub
+
+2. Décompresser le fichier ZIP
+
 3. Ouvrir le fichier :
 
 index.html
 
-Le logiciel fonctionne directement dans le navigateur.
+Le logiciel démarre immédiatement dans le navigateur.
 
-## Licence
+---
 
-Ce logiciel utilise un fichier licence.json pour valider l'utilisation.
+## Structure du projet
 
-## Auteur
-
-Jean-Louis Raymond
