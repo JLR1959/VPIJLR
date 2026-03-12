@@ -786,3 +786,193 @@ border:1px solid #ccc;
 margin-top:10px;
 
 }
+
+/* ======================================================
+MODULE CSS 30
+SECTION LICENCES COMMERCIALES
+À AJOUTER À LA FIN DU FICHIER
+====================================================== */
+
+#licences-vpijlr{
+
+margin-top:40px;
+
+}
+
+.licences-container{
+
+display:flex;
+
+gap:30px;
+
+flex-wrap:wrap;
+
+justify-content:center;
+
+margin-top:30px;
+
+}
+
+.licence{
+
+background:#ffffff;
+
+border:1px solid #e5e7eb;
+
+border-radius:14px;
+
+padding:30px;
+
+width:280px;
+
+text-align:center;
+
+box-shadow:
+0 12px 30px rgba(0,0,0,0.08),
+0 30px 60px rgba(0,0,0,0.12);
+
+transition:.25s;
+
+}
+
+.licence:hover{
+
+transform:translateY(-6px);
+
+box-shadow:
+0 20px 50px rgba(0,0,0,0.12),
+0 60px 120px rgba(0,0,0,0.15);
+
+}
+
+.licence h3{
+
+margin-top:0;
+
+font-size:22px;
+
+color:var(--bleu-profond);
+
+}
+
+.prix{
+
+font-size:30px;
+
+font-weight:900;
+
+color:var(--bleu);
+
+margin:20px 0;
+
+}
+
+.licence ul{
+
+list-style:none;
+
+padding:0;
+
+margin:20px 0;
+
+}
+
+.licence li{
+
+padding:6px 0;
+
+font-weight:500;
+
+}
+
+.licence button{
+
+margin-top:10px;
+
+width:100%;
+
+font-size:16px;
+
+padding:14px;
+
+}
+
+
+/* ======================================================
+MODULE CSS 31
+SECTION ENGAGEMENT
+====================================================== */
+
+#engagement-vpijlr{
+
+margin-top:40px;
+
+}
+
+#engagement-vpijlr ul{
+
+margin-top:15px;
+
+padding-left:20px;
+
+}
+
+#engagement-vpijlr li{
+
+margin-bottom:10px;
+
+font-weight:500;
+
+}
+
+
+/* ======================================================
+MODULE CSS 32
+APPEL À L'ACTION
+====================================================== */
+
+#appel-action{
+
+text-align:center;
+
+margin-top:50px;
+
+}
+
+#appel-action button{
+
+font-size:18px;
+
+padding:16px 30px;
+
+background:var(--vert);
+
+box-shadow:
+0 8px 0 #15803d,
+0 15px 30px rgba(0,0,0,0.25);
+
+}
+
+#appel-action button:hover{
+
+background:#22c55e;
+
+}
+
+
+/* ======================================================
+MODULE CSS 33
+RESPONSIVE LICENCES
+====================================================== */
+
+@media (max-width:900px){
+
+.licences-container{
+
+flex-direction:column;
+
+align-items:center;
+
+}
+
+}

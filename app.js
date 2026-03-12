@@ -1,7 +1,7 @@
-// ======================================================
-// MODULE 1
-// NUMÉRO DOSSIER AUTOMATIQUE
-// ======================================================
+/* ======================================================
+MODULE 1
+NUMÉRO DOSSIER AUTOMATIQUE AVEC HEURE
+====================================================== */
 
 function genererNumeroDossier() {
 
@@ -17,52 +17,35 @@ function genererNumeroDossier() {
     return;
   }
 
-  const aujourdHui = new Date();
+  const maintenant = new Date();
 
   const dateActive =
-    aujourdHui.getFullYear().toString() +
-    String(aujourdHui.getMonth() + 1).padStart(2, "0") +
-    String(aujourdHui.getDate()).padStart(2, "0");
+    maintenant.getFullYear().toString() +
+    String(maintenant.getMonth() + 1).padStart(2, "0") +
+    String(maintenant.getDate()).padStart(2, "0");
+
+  const heureMinute =
+    String(maintenant.getHours()).padStart(2, "0") +
+    String(maintenant.getMinutes()).padStart(2, "0");
 
   const nomFormate = nom
-    .toLowerCase()
+    .toUpperCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, "");
 
   const telephoneFormate = tel.replace(/\D/g, "");
-  const appartementFormate = apt.toLowerCase().replace(/\s+/g, "");
+  const appartementFormate = apt.toUpperCase().replace(/\s+/g, "");
 
   champ.value =
     "VPIJLR-" +
     dateActive + "-" +
+    heureMinute + "-" +
     nomFormate + "-" +
     telephoneFormate + "-" +
     appartementFormate;
 
 }
-
-document.addEventListener("DOMContentLoaded", function () {
-
-  const champs = [
-    "locataire",
-    "telephone",
-    "numeroAppartement"
-  ];
-
-  champs.forEach(id => {
-
-    const element = document.getElementById(id);
-    if (!element) return;
-
-    element.addEventListener("input", genererNumeroDossier);
-    element.addEventListener("change", genererNumeroDossier);
-
-  });
-
-  genererNumeroDossier();
-
-});
 
 // ======================================================
 // MODULE 2
@@ -155,37 +138,101 @@ const equipementsTechniques = {
     champ("Garde-corps balcon - État", ["Bon","Instable","Non conforme"])
 
 };
-
 // ======================================================
 // MODULE 4
-// AJOUT ÉQUIPEMENT
+// CHOISIR TYPE DE VÉRIFICATION (intérieur / extérieur)
 // ======================================================
 
-function ajouterEquipement(pieceId) {
+function choisirVerification(type) {
+    const bandeau = document.getElementById("bandeau-mode-verification");
+    const piecesInterieur = document.getElementById("pieces-interieur");
+    const piecesExterieur = document.getElementById("pieces-exterieur");
+    const champType = document.getElementById("type-verification"); // Ajouté pour suivre la sélection
 
-  const piece = document.getElementById(pieceId);
-  if (!piece) return;
+    // Mise à jour du bandeau
+    if (bandeau) {
+        if (type === "interieur") {
+            bandeau.textContent = "Mode de vérification : INTÉRIEURE";
+            piecesInterieur.style.display = "block";
+            piecesExterieur.style.display = "none";
+            champType.value = "interieur"; // Mise à jour de la valeur
+        } else if (type === "exterieur") {
+            bandeau.textContent = "Mode de vérification : EXTÉRIEURE";
+            piecesExterieur.style.display = "block";
+            piecesInterieur.style.display = "none";
+            champType.value = "exterieur"; // Mise à jour de la valeur
+        }
+    }
+}
 
-  const select = document.getElementById("equipement-" + pieceId);
-  const type = select.value;
+// ======================================================
+// MODULE 5
+// AJOUTER PIÈCE AVEC VERROU BANDEAU OBLIGATOIRE
+// ======================================================
 
-  if (!type) return;
+function ajouterPiece(){
+    const champType = document.getElementById("type-verification");
+    const select = document.getElementById("type-piece");
+    const sectionPieces = document.getElementById("section-pieces-verification");
+    const liste = document.getElementById("liste-pieces");
 
-  const zone = piece.querySelector(".liste-equipements");
+    // Sécurité : type obligatoire
+    if(!champType || champType.value === ""){
+        alert("Veuillez d'abord sélectionner un type de vérification avec les bandeaux.");
+        return;
+    }
 
-  const bloc = document.createElement("div");
-  bloc.className = "bloc-equipement";
+    // Sécurité : menu obligatoire
+    if(!select){
+        alert("Menu des pièces introuvable.");
+        return;
+    }
 
-  bloc.innerHTML =
-  `<strong>${type}</strong>
-   <button type="button" onclick="this.parentElement.remove()">Supprimer</button>
-   ${equipementsTechniques[type]()}
-  `;
+    const piece = select.value;
 
-  zone.appendChild(bloc);
+    if(piece === ""){
+        alert("Veuillez sélectionner une pièce.");
+        return;
+    }
 
-  select.value = "";
+    // Afficher la section des pièces seulement maintenant
+    if(sectionPieces){
+        sectionPieces.style.display = "block";
+    }
 
+    if(!liste){
+        alert("Liste des pièces introuvable.");
+        return;
+    }
+
+    // Créer un bloc
+    const bloc = document.createElement("div");
+    bloc.className = "piece-container";
+
+    // Couleur selon mode
+    if(champType.value === "interieur"){
+        bloc.classList.add("piece-interieur");
+    }
+
+    if(champType.value === "exterieur"){
+        bloc.classList.add("piece-exterieur");
+    }
+
+    // Contenu minimal stable
+    bloc.innerHTML = `
+    <div class="piece-header">
+        <span class="piece-titre">${piece}</span>
+        <div class="piece-actions">
+            <button type="button" onclick="this.closest('.piece-container').remove()">Retirer</button>
+        </div>
+    </div>
+    `;
+
+    // Ajouter le bloc à la liste
+    liste.appendChild(bloc);
+
+    // Réinitialiser la sélection
+    select.value = "";
 }
 
 // ======================================================
@@ -2489,22 +2536,52 @@ zone.innerHTML =
 "<h3>Total : " + total.toFixed(2) + " $</h3>";
 
 }
+
 /* ======================================================
 MODULE 7.1
-IMPRESSION DU RAPPORT (STABLE)
+IMPRESSION RAPPORT PROPRE (SANS JAVASCRIPT)
 ====================================================== */
 
 function imprimerRapport(){
 
+if(typeof genererRapportImpression === "function"){
 genererRapportImpression();
+}
 
-const contenu = document.getElementById("rapport-impression").innerHTML;
+if(typeof remplirInformationsRapport === "function"){
+remplirInformationsRapport();
+}
+
+const zone = document.getElementById("rapport-impression");
+
+if(!zone){
+alert("Zone rapport introuvable");
+return;
+}
+
+/* clone propre du rapport */
+
+const clone = zone.cloneNode(true);
+
+/* supprimer scripts */
+
+clone.querySelectorAll("script").forEach(function(s){
+s.remove();
+});
+
+/* fenêtre impression */
 
 const fenetre = window.open("", "_blank");
 
+/* structure HTML propre */
+
+fenetre.document.open();
+
 fenetre.document.write(`
+<!DOCTYPE html>
 <html>
 <head>
+
 <title>Rapport de vérification</title>
 
 <style>
@@ -2515,21 +2592,13 @@ padding:40px;
 line-height:1.5;
 }
 
-h1,h2,h3{
-margin-top:20px;
-}
-
 img{
 max-width:300px;
 margin-top:10px;
 }
 
-@media print{
-
 .page-break{
-page-break-after:always;
-}
-
+page-break-before:always;
 }
 
 </style>
@@ -2538,20 +2607,27 @@ page-break-after:always;
 
 <body>
 
-${contenu}
-
-<script>
-window.onload=function(){
-window.print();
-window.close();
-}
-</script>
+<div id="zone-rapport-print"></div>
 
 </body>
+
 </html>
 `);
 
 fenetre.document.close();
+
+/* injecter uniquement le rapport */
+
+fenetre.document.getElementById("zone-rapport-print").appendChild(clone);
+
+/* impression */
+
+setTimeout(function(){
+
+fenetre.print();
+fenetre.close();
+
+},300);
 
 }
 
@@ -2808,7 +2884,7 @@ let tempsTotalSecondes = 0;
 let intervalMinuteur = null;
 let minuteurEnCours = false;
 
-const tauxHoraire = 125;
+let tauxHoraire = 125;
 
 function formaterTemps(secondes) {
 
@@ -2921,15 +2997,13 @@ function genererMailto() {
 
   // 🟢 À GARDER
   contenu += "VÉRIFICATION PRÉVENTIVE IMMOBILIÈRE\n";
-  contenu += "Jean-Louis Raymond\n";
-  contenu += "Consultant en vérification préventive\n\n";
-
-  contenu += "Courriel : jlouisraymond@hotmail.com\n";
-  contenu += "Téléphone : 438-220-6511\n";
-  contenu += "NEQ : 2268876952\n";
-  contenu += "TPS : 771362471 RT 0001\n";
-  contenu += "TVQ : 1227894560 TQ 0001\n";
-  contenu += "====================================================\n\n";
+  contenu += profilEntreprise.entreprise + "\n";
+  contenu += "Consultant : " + profilEntreprise.nom + "\n\n";
+  contenu += "Courriel : " + profilEntreprise.courriel + "\n";
+  contenu += "Téléphone : " + profilEntreprise.telephone + "\n";
+  contenu += "NEQ : " + profilEntreprise.neq + "\n";
+  contenu += "TPS : " + profilEntreprise.tps + "\n";
+  contenu += "TVQ : " + profilEntreprise.tvq + "\n";
 
   contenu += "Numéro de dossier : " + dossier + "\n";
   contenu += "Locataire : " + locataire + "\n";
@@ -3092,39 +3166,10 @@ zone.appendChild(ligne);
 
 }
 
-// ======================================================
-// MODULE 14
-// SAUVEGARDE DOSSIER CLIENT
-// ======================================================
 
-function sauvegarderDossierClient(){
-
-const dossier = {};
-
-document.querySelectorAll("input, select, textarea").forEach(function(champ){
-
-if(!champ.id) return;
-
-if(champ.type === "checkbox"){
-dossier[champ.id] = champ.checked;
-}else{
-dossier[champ.id] = champ.value;
-}
-
-});
-
-let dossiers = JSON.parse(localStorage.getItem("VPI_DOSSIERS") || "[]");
-
-dossiers.push(dossier);
-
-localStorage.setItem("VPI_DOSSIERS", JSON.stringify(dossiers));
-
-alert("Dossier client enregistré.");
-
-}
 
 // ======================================================
-// MODULE 15
+// MODULE 15.1
 // OUVRIR DOSSIER CLIENT
 // ======================================================
 
@@ -3370,10 +3415,17 @@ const section = document.getElementById("contenu-client");
 
 if(!section) return;
 
-section.classList.toggle("section-replie");
+if(section.classList.contains("section-replie")){
+
+section.classList.remove("section-replie");
+
+}else{
+
+section.classList.add("section-replie");
 
 }
 
+}
 
 /* ======================================================
 MODULE 27
@@ -4153,5 +4205,390 @@ afficherInfosLicence();
 
 });
 
+/* ======================================================
+MODULE 300
+CHARGER PROFIL ENTREPRISE
+====================================================== */
 
+let profilEntreprise = {};
+
+async function chargerProfilEntreprise(){
+
+try{
+
+const reponse = await fetch("entreprise.json");
+
+profilEntreprise = await reponse.json();
+
+}catch(e){
+
+console.log("Profil entreprise introuvable");
+
+}
+
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+
+chargerProfilEntreprise();
+
+});
+
+/* ======================================================
+MODULE 301
+GESTION VISIBILITÉ FACTURATION
+====================================================== */
+
+let facturationVisible = true;
+
+function masquerFacturation(){
+
+facturationVisible = false;
+
+localStorage.setItem("facturationVisible","false");
+
+alert("Facturation masquée dans les rapports.");
+
+}
+
+function afficherFacturation(){
+
+facturationVisible = true;
+
+localStorage.setItem("facturationVisible","true");
+
+alert("Facturation visible dans les rapports.");
+
+}
+
+/* restauration état */
+
+document.addEventListener("DOMContentLoaded",function(){
+
+const etat = localStorage.getItem("facturationVisible");
+
+if(etat === "false"){
+facturationVisible = false;
+}
+
+});
+
+
+/* ======================================================
+MODULE 302
+TAUX HORAIRE ADMINISTRATEUR
+====================================================== */
+
+document.addEventListener("DOMContentLoaded",function(){
+
+const tauxSauvegarde = localStorage.getItem("tauxHoraire");
+
+if(tauxSauvegarde){
+tauxHoraire = parseFloat(tauxSauvegarde);
+}
+
+});
+
+function modifierTauxHoraire(){
+
+const champ = document.getElementById("admin-taux-horaire");
+
+if(!champ) return;
+
+const nouveauTaux = parseFloat(champ.value);
+
+if(isNaN(nouveauTaux) || nouveauTaux <= 0){
+
+alert("Taux invalide");
+return;
+
+}
+
+tauxHoraire = nouveauTaux;
+
+localStorage.setItem("tauxHoraire",tauxHoraire);
+
+alert("Taux horaire modifié : " + tauxHoraire + " $");
+
+}
+
+
+/* ======================================================
+MODULE 304
+REMPLACER INFORMATIONS ENTREPRISE DANS RAPPORT
+====================================================== */
+
+function remplirInformationsRapport(){
+
+if(!profilEntreprise) return;
+
+/* nom entreprise */
+
+const nom = document.getElementById("rapport-entreprise-nom");
+if(nom){
+nom.textContent = profilEntreprise.nom || "";
+}
+
+/* titre */
+
+const titre = document.getElementById("rapport-entreprise-titre");
+if(titre){
+titre.textContent = profilEntreprise.titre || "";
+}
+
+/* contact */
+
+const contact = document.getElementById("rapport-entreprise-contact");
+if(contact){
+contact.textContent =
+"📧 " + (profilEntreprise.courriel || "") +
+" | 📞 " + (profilEntreprise.telephone || "");
+}
+
+/* NEQ */
+
+const neq = document.getElementById("rapport-entreprise-neq");
+if(neq){
+neq.textContent = "NEQ : " + (profilEntreprise.neq || "");
+}
+
+/* taxes */
+
+const taxes = document.getElementById("rapport-entreprise-taxes");
+if(taxes){
+taxes.textContent =
+"TPS : " + (profilEntreprise.tps || "") +
+" | TVQ : " + (profilEntreprise.tvq || "");
+}
+
+}
+
+/* ======================================================
+MODULE 304
+AFFICHAGE ENTREPRISE CLIENT DANS ENTÊTE
+====================================================== */
+
+function afficherInfosEntreprise(){
+
+if(!profilEntreprise) return;
+
+/* nom entreprise */
+
+const nom = document.getElementById("entreprise-nom");
+if(nom){
+nom.textContent = profilEntreprise.nom || "";
+}
+
+/* titre */
+
+const titre = document.getElementById("entreprise-titre");
+if(titre){
+titre.textContent = profilEntreprise.titre || "";
+}
+
+/* contact */
+
+const contact = document.getElementById("entreprise-contact");
+if(contact){
+contact.textContent =
+"📧 " + (profilEntreprise.courriel || "") +
+" | 📞 " + (profilEntreprise.telephone || "");
+}
+
+/* NEQ */
+
+const neq = document.getElementById("entreprise-neq");
+if(neq){
+neq.textContent = "NEQ : " + (profilEntreprise.neq || "");
+}
+
+/* taxes */
+
+const taxes = document.getElementById("entreprise-taxes");
+if(taxes){
+taxes.textContent =
+"TPS : " + (profilEntreprise.tps || "") +
+" | TVQ : " + (profilEntreprise.tvq || "");
+}
+
+}
+
+/* ======================================================
+MODULE 306
+INDICATEUR ÉTAT VÉRIFICATION
+POINT ROUGE / VERT + COLORATION CHAMP
+====================================================== */
+
+function verifierEtat(piece, champ){
+
+const indicateur = document.getElementById("etat-"+piece);
+
+if(!champ.value){
+
+if(indicateur){
+indicateur.className = "point-etat point-attente";
+}
+
+champ.classList.remove("champ-ok");
+champ.classList.remove("champ-probleme");
+
+return;
+
+}
+
+/* logique simple : si "ok" écrit → conforme */
+
+if(champ.value.toLowerCase().includes("ok")){
+
+if(indicateur){
+indicateur.className = "point-etat point-ok";
+}
+
+champ.classList.add("champ-ok");
+
+}else{
+
+if(indicateur){
+indicateur.className = "point-etat point-probleme";
+}
+
+champ.classList.add("champ-probleme");
+
+}
+
+}
+
+/* ======================================================
+MODULE 307
+INDICATEUR CHAMP VÉRIFICATION
+VERT / ROUGE / À COMPLÉTER
+====================================================== */
+
+function verifierChamp(idChamp){
+
+const champ = document.getElementById(idChamp);
+const indicateur = document.getElementById("etat-"+idChamp);
+
+if(!champ || !indicateur) return;
+
+/* champ vide */
+
+if(champ.value.trim() === ""){
+
+indicateur.className = "point-etat point-attente";
+return;
+
+}
+
+/* mots indiquant défaut */
+
+const motsProbleme = [
+"brisé",
+"fissure",
+"défectueux",
+"endommagé",
+"cassé",
+"usé",
+"tache",
+"fuite",
+"moisissure"
+];
+
+const valeur = champ.value.toLowerCase();
+
+let probleme = false;
+
+motsProbleme.forEach(function(mot){
+
+if(valeur.includes(mot)){
+probleme = true;
+}
+
+});
+
+/* état final */
+
+if(probleme){
+
+indicateur.className = "point-etat point-probleme";
+
+}else{
+
+indicateur.className = "point-etat point-ok";
+
+}
+
+}
+
+/* ======================================================
+MODULE 309
+VERROU BANDEAU OBLIGATOIRE
+====================================================== */
+
+function verificationAutorisee(){
+
+const type = document.getElementById("type-verification");
+
+if(!type || type.value === ""){
+
+alert("Veuillez d'abord sélectionner un type de vérification avec les bandeaux.");
+
+return false;
+
+}
+
+return true;
+
+}
+
+/* ======================================================
+MODULE 310
+BANDEAU CLIQUABLE OUVERTURE PIÈCES
+====================================================== */
+
+document.addEventListener("DOMContentLoaded", function(){
+
+const bandeau = document.getElementById("bandeau-mode-verification");
+const interieur = document.getElementById("pieces-interieur");
+const exterieur = document.getElementById("pieces-exterieur");
+
+if(!bandeau) return;
+
+/* clic sur le bandeau */
+
+bandeau.addEventListener("click", function(){
+
+const texte = bandeau.textContent;
+
+/* ouvrir intérieur */
+
+if(texte.includes("INTÉRIEURE")){
+
+if(interieur){
+interieur.style.display = "block";
+}
+
+if(exterieur){
+exterieur.style.display = "none";
+}
+
+}
+
+/* ouvrir extérieur */
+
+if(texte.includes("EXTÉRIEURE")){
+
+if(exterieur){
+exterieur.style.display = "block";
+}
+
+if(interieur){
+interieur.style.display = "none";
+}
+
+}
+
+});
+
+});
 
