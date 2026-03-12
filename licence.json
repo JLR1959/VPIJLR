@@ -1,0 +1,34 @@
+{
+"logiciel":"VPIJLR",
+"client":"Bloc Tremblay",
+"expiration":"2026-12-31",
+"cle":"ABC123XYZ",
+"mode":"locataire"
+}
+
+{
+"logiciel":"VPIJLR",
+"type":"client",
+"client":"Bloc Tremblay",
+"expiration":"2026-12-31",
+"mode":"locataire",
+"utilisateurs":1
+}
+
+{
+"logiciel":"VPIJLR",
+"type":"entreprise",
+"client":"Gestion Immobilière Roy",
+"expiration":"2026-12-31",
+"mode":"locataire",
+"utilisateurs":10
+}
+
+{
+"logiciel":"VPIJLR",
+"type":"entreprise",
+"client":"Gestion Nationale",
+"expiration":"2026-12-31",
+"mode":"locataire",
+"utilisateurs":"illimite"
+}
