@@ -4755,6 +4755,17 @@ return false;
 const licence = await reponse.json();
 
 
+/* verification champs obligatoires */
+
+if(!licence.cle || !licence.client || !licence.expiration){
+
+console.log("Licence invalide : champs manquants");
+
+return false;
+
+}
+
+
 /* verification signature */
 
 const signatureCalculee = calculerSignature(licence);
@@ -4822,6 +4833,17 @@ return false;
 
 }
 
+
+/* verification installations */
+
+if(typeof verifierInstallation === "function"){
+
+if(!verifierInstallation(licence)){
+return false;
+}
+
+}
+
 return true;
 
 }catch(e){
@@ -4833,8 +4855,6 @@ return false;
 }
 
 }
-
-
 
 /* ======================================================
 MODULE 133
@@ -4856,3 +4876,52 @@ return;
 }
 
 });
+
+/* ======================================================
+MODULE 134
+CONTROLE INSTALLATIONS LICENCE
+====================================================== */
+
+function verifierInstallation(licence){
+
+let installations = JSON.parse(localStorage.getItem("vpijlr_installations")) || [];
+
+const machineID = genererMachineID();
+
+/* machine déjà enregistrée */
+
+if(installations.includes(machineID)){
+return true;
+}
+
+/* nombre max installations */
+
+const maxInstallations = licence.utilisateurs || 1;
+
+if(installations.length >= maxInstallations){
+
+document.body.innerHTML = `
+<div style="text-align:center;margin-top:120px;font-family:Arial;">
+
+<h1>Licence déjà utilisée</h1>
+
+<p>
+Le nombre maximal d'installations pour cette licence est atteint.
+</p>
+
+</div>
+`;
+
+return false;
+
+}
+
+/* enregistrer nouvelle installation */
+
+installations.push(machineID);
+
+localStorage.setItem("vpijlr_installations",JSON.stringify(installations));
+
+return true;
+
+}
