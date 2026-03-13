@@ -218,3 +218,91 @@ chargerInterfaceClient();
 chargerRapportClient();
 
 });
+
+/* ======================================================
+MODULE 300
+SAUVEGARDE CONFIGURATION ENTREPRISE
+====================================================== */
+
+function validerEntreprise(){
+
+const nom = document.getElementById("entreprise-nom").value;
+const adresse = document.getElementById("entreprise-adresse").value;
+const licence = document.getElementById("entreprise-licence").value;
+const tps = document.getElementById("entreprise-tps").value;
+const tvq = document.getElementById("entreprise-tvq").value;
+
+const entreprise = {
+
+nom: nom,
+adresse: adresse,
+licence: licence,
+tps: tps,
+tvq: tvq
+
+};
+
+localStorage.setItem(
+"vpijlr_configuration_entreprise",
+JSON.stringify(entreprise)
+);
+
+const fenetre = document.getElementById("fenetre-entreprise");
+
+if(fenetre){
+fenetre.style.display = "none";
+}
+
+alert("Configuration entreprise enregistrée");
+
+}
+
+
+/* ======================================================
+MODULE 350
+ADMIN – AFFICHER / CACHER FACTURATION
+====================================================== */
+
+function basculerFacturationAdmin(){
+
+const section = document.getElementById("section-facturation");
+
+if(!section) return;
+
+let etat = localStorage.getItem("vpijlr_facturation_visible");
+
+if(etat === "false"){
+
+section.style.display = "block";
+localStorage.setItem("vpijlr_facturation_visible","true");
+
+}else{
+
+section.style.display = "none";
+localStorage.setItem("vpijlr_facturation_visible","false");
+
+}
+
+}
+
+
+/* ======================================================
+MODULE 351
+CHARGEMENT VISIBILITÉ FACTURATION
+====================================================== */
+
+document.addEventListener("DOMContentLoaded",function(){
+
+const section = document.getElementById("section-facturation");
+
+if(!section) return;
+
+let etat = localStorage.getItem("vpijlr_facturation_visible");
+
+if(etat === "false"){
+
+section.style.display = "none";
+
+}
+
+});
