@@ -254,7 +254,7 @@ function choisirVerification(type) {
 }
 
 // ======================================================
-// MODULE 5
+// MODULE 4.1
 // AJOUTER PIÈCE AVEC VERROU BANDEAU OBLIGATOIRE
 // ======================================================
 
@@ -4925,3 +4925,90 @@ localStorage.setItem("vpijlr_installations",JSON.stringify(installations));
 return true;
 
 }
+
+/* ======================================================
+MODULE 400
+CONFIGURATION ENTREPRISE (ENREGISTREMENT LOCAL)
+====================================================== */
+
+function validerEntreprise(){
+
+const entreprise = {
+
+nom: document.getElementById("entreprise-nom")?.value || "",
+adresse: document.getElementById("entreprise-adresse")?.value || "",
+licence: document.getElementById("entreprise-licence")?.value || "",
+tps: document.getElementById("entreprise-tps")?.value || "",
+tvq: document.getElementById("entreprise-tvq")?.value || ""
+
+};
+
+localStorage.setItem(
+"vpijlr_entreprise",
+JSON.stringify(entreprise)
+);
+
+alert("Informations de l'entreprise enregistrées");
+
+const fenetre = document.getElementById("fenetre-entreprise");
+
+if(fenetre){
+fenetre.style.display = "none";
+}
+
+}
+
+/* ======================================================
+MODULE 350
+ADMIN – FACTURATION VISIBLE / CACHÉE
+====================================================== */
+
+function basculerFacturationAdmin(){
+
+const section = document.getElementById("section-facturation");
+
+if(!section) return;
+
+let etat = localStorage.getItem("vpijlr_facturation_visible");
+
+if(etat === "false"){
+
+section.style.display = "block";
+
+localStorage.setItem("vpijlr_facturation_visible","true");
+
+alert("Facturation visible dans l'impression du rapport");
+
+}else{
+
+section.style.display = "none";
+
+localStorage.setItem("vpijlr_facturation_visible","false");
+
+alert("Facturation cachée dans l'impression du rapport");
+
+}
+
+}
+
+
+/* ======================================================
+MODULE 351
+CHARGEMENT VISIBILITÉ FACTURATION
+====================================================== */
+
+document.addEventListener("DOMContentLoaded",function(){
+
+const section = document.getElementById("section-facturation");
+
+if(!section) return;
+
+let etat = localStorage.getItem("vpijlr_facturation_visible");
+
+if(etat === "false"){
+
+section.style.display = "none";
+
+}
+
+});

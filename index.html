@@ -18,7 +18,7 @@ HEAD / CONFIGURATION
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script src="configClient.js"></script>
-<script src="app.js"></script>
+<script defer src="app.js"></script>
 <script defer src="typeVerification.js"></script>
 <script defer src="gestionImpression.js"></script>
 <script defer src="signatureMobile.js"></script>
@@ -431,7 +431,7 @@ Effacer signature consultant
 
 <!-- ======================================================
 MODULE 10
-PANNEAU ADMIN MINUTEUR AVEC MOT DE PASSE
+PANNEAU ADMIN MINUTEUR + CONTRÔLES ADMIN
 ====================================================== -->
 
 <section id="admin-minuteur" class="no-print">
@@ -456,6 +456,10 @@ Accéder au mode admin
 Afficher / Cacher le minuteur
 </button>
 
+<button type="button" onclick="basculerFacturationAdmin()">
+Afficher / Cacher Facturation
+</button>
+
 <button type="button" onclick="desactiverModeAdmin()">
 Quitter mode admin
 </button>
@@ -463,7 +467,6 @@ Quitter mode admin
 </div>
 
 </section>
-
 <!-- ======================================================
 MODULE 11
 MINUTEUR DE VÉRIFICATION
@@ -612,7 +615,8 @@ MODULE 15
 FACTURATION RAPPORT DYNAMIQUE
 ====================================================== -->
 <div class="page-break"></div>
-<section>
+
+<section id="section-facturation">
 
 <h2>Facturation</h2>
 
@@ -629,8 +633,6 @@ FACTURATION RAPPORT DYNAMIQUE
 <h3>Total à payer : <span id="rapport-total">0.00</span> $</h3>
 
 </section>
-
-
 
 <!-- ======================================================
 MODULE SIGNATURES RAPPORT
