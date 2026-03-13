@@ -5012,3 +5012,121 @@ section.style.display = "none";
 }
 
 });
+
+/* ======================================================
+MODULE 400
+BASE DE DONNÉES INDEXEDDB
+====================================================== */
+
+let db;
+
+const request = indexedDB.open("VPIJLR_DATABASE",1);
+
+request.onupgradeneeded = function(e){
+
+db = e.target.result;
+
+if(!db.objectStoreNames.contains("rapports")){
+
+db.createObjectStore("rapports",{keyPath:"id"});
+
+}
+
+};
+
+request.onsuccess = function(e){
+
+db = e.target.result;
+
+};
+
+request.onerror = function(){
+
+console.log("Erreur base de données");
+
+};
+
+/* ======================================================
+MODULE 401
+SAUVEGARDE RAPPORT
+====================================================== */
+
+function sauvegarderRapport(){
+
+if(!db) return;
+
+const transaction = db.transaction(["rapports"],"readwrite");
+
+const store = transaction.objectStore("rapports");
+
+const rapport = {
+
+id:"rapport-courant",
+
+locataire: document.getElementById("locataire")?.value || "",
+telephone: document.getElementById("telephone")?.value || "",
+adresse: document.getElementById("adresse")?.value || "",
+ville: document.getElementById("ville-quebec")?.value || "",
+codePostal: document.getElementById("codePostal")?.value || "",
+province: document.getElementById("province")?.value || "",
+pays: document.getElementById("pays")?.value || "",
+verificateur: document.getElementById("verificateur")?.value || "",
+date: document.getElementById("verification-date")?.value || "",
+
+facturationVisible: localStorage.getItem("vpijlr_facturation_visible")
+
+};
+
+store.put(rapport);
+
+console.log("Sauvegarde effectuée");
+
+}
+
+/* ======================================================
+MODULE 402
+SAUVEGARDE AUTOMATIQUE
+====================================================== */
+
+setInterval(function(){
+
+sauvegarderRapport();
+
+},120000);
+
+/* ======================================================
+MODULE 403
+RESTAURATION AUTOMATIQUE
+====================================================== */
+
+function chargerRapport(){
+
+if(!db) return;
+
+const transaction = db.transaction(["rapports"],"readonly");
+
+const store = transaction.objectStore("rapports");
+
+const request = store.get("rapport-courant");
+
+request.onsuccess = function(){
+
+const data = request.result;
+
+if(!data) return;
+
+document.getElementById("locataire").value = data.locataire || "";
+document.getElementById("telephone").value = data.telephone || "";
+document.getElementById("adresse").value = data.adresse || "";
+document.getElementById("ville-quebec").value = data.ville || "";
+document.getElementById("codePostal").value = data.codePostal || "";
+
+};
+
+}
+
+document.addEventListener("DOMContentLoaded",function(){
+
+setTimeout(chargerRapport,1000);
+
+});
