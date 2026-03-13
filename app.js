@@ -1,4 +1,92 @@
 /* ======================================================
+MODULE 01
+DEMO 24 HEURES VPIJLR
+====================================================== */
+
+function verifierDemo(){
+
+const cle = "vpijlr_demo_depart";
+const duree = 24 * 60 * 60 * 1000;
+
+let debut = localStorage.getItem(cle);
+
+if(!debut){
+
+debut = Date.now();
+localStorage.setItem(cle, debut);
+
+}
+
+const temps = Date.now() - debut;
+
+if(temps > duree){
+
+document.body.innerHTML = `
+
+<div style="
+display:flex;
+align-items:center;
+justify-content:center;
+height:100vh;
+font-family:Arial;
+text-align:center;
+">
+
+<div>
+
+<h1>Version démo expirée</h1>
+
+<p>
+La période d'essai de 24 heures du logiciel
+VPIJLR 2026 est terminée.
+</p>
+
+<p>
+Veuillez acheter une licence pour continuer.
+</p>
+
+</div>
+
+</div>
+
+`;
+
+return false;
+
+}
+
+return true;
+
+}
+
+
+/* ======================================================
+MODULE 90
+VERIFICATION LICENCE JSON
+====================================================== */
+
+async function verifierLicence(){
+
+const reponse = await fetch("licence.json");
+const licence = await reponse.json();
+
+const aujourd = new Date();
+const expiration = new Date(licence.expiration);
+
+if(licence.expiration !== "illimite" && aujourd > expiration){
+
+alert("Votre licence VPIJLR est expirée");
+
+document.body.innerHTML = `
+<h1>Licence expirée</h1>
+<p>Veuillez renouveler votre licence pour continuer.</p>
+`;
+
+}
+
+}
+
+/* ======================================================
 MODULE 1
 NUMÉRO DOSSIER AUTOMATIQUE AVEC HEURE
 ====================================================== */
@@ -4591,4 +4679,180 @@ interieur.style.display = "none";
 });
 
 });
+/* ======================================================
+MODULE 130
+GENERATION MACHINE ID
+====================================================== */
 
+function genererMachineID(){
+
+let id = localStorage.getItem("vpijlr_machine_id");
+
+if(!id){
+
+const base = navigator.userAgent + screen.width + screen.height + Date.now();
+
+let hash = 0;
+
+for(let i=0;i<base.length;i++){
+
+hash = ((hash << 5) - hash) + base.charCodeAt(i);
+hash = hash & hash;
+
+}
+
+id = Math.abs(hash).toString(36).toUpperCase();
+
+localStorage.setItem("vpijlr_machine_id",id);
+
+}
+
+return id;
+
+}
+
+
+
+/* ======================================================
+MODULE 131
+CALCUL SIGNATURE LICENCE
+====================================================== */
+
+function calculerSignature(licence){
+
+const texte = licence.client + licence.expiration + licence.cle;
+
+let hash = 0;
+
+for(let i=0;i<texte.length;i++){
+
+hash = ((hash << 5) - hash) + texte.charCodeAt(i);
+hash = hash & hash;
+
+}
+
+return Math.abs(hash).toString(36).toUpperCase();
+
+}
+
+
+
+/* ======================================================
+MODULE 132
+VERIFICATION LICENCE
+====================================================== */
+
+async function verifierLicence(){
+
+try{
+
+const reponse = await fetch("licence.json");
+
+if(!reponse.ok){
+return false;
+}
+
+const licence = await reponse.json();
+
+
+/* verification signature */
+
+const signatureCalculee = calculerSignature(licence);
+
+if(signatureCalculee !== licence.signature){
+
+document.body.innerHTML = `
+<div style="text-align:center;margin-top:120px;font-family:Arial;">
+
+<h1>Licence invalide</h1>
+
+<p>La signature de licence est invalide.</p>
+
+</div>
+`;
+
+return false;
+
+}
+
+
+/* verification machine */
+
+const machineID = genererMachineID();
+
+if(licence.machine && licence.machine !== machineID){
+
+document.body.innerHTML = `
+<div style="text-align:center;margin-top:120px;font-family:Arial;">
+
+<h1>Licence utilisée sur un autre ordinateur</h1>
+
+<p>Cette licence est déjà activée sur un autre appareil.</p>
+
+</div>
+`;
+
+return false;
+
+}
+
+
+/* verification expiration */
+
+if(licence.expiration !== "illimite"){
+
+const aujourd = new Date();
+const expiration = new Date(licence.expiration);
+
+if(aujourd > expiration){
+
+document.body.innerHTML = `
+<div style="text-align:center;margin-top:120px;font-family:Arial;">
+
+<h1>Licence expirée</h1>
+
+<p>Votre licence VPIJLR est expirée.</p>
+
+</div>
+`;
+
+return false;
+
+}
+
+}
+
+return true;
+
+}catch(e){
+
+console.log("Licence non trouvée");
+
+return false;
+
+}
+
+}
+
+
+
+/* ======================================================
+MODULE 133
+DEMARRAGE CONTROLE LICENCE
+====================================================== */
+
+document.addEventListener("DOMContentLoaded", async function(){
+
+const licenceValide = await verifierLicence();
+
+if(!licenceValide){
+
+const demoValide = verifierDemo();
+
+if(!demoValide){
+return;
+}
+
+}
+
+});
