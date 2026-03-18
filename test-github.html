@@ -1,10 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>GitHub JSON Cloud</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+
+<h1>Test Cloud GitHub</h1>
+
+<button id="btnCharger">Charger les données</button>
+<button id="btnAjouter">Ajouter client test</button>
+
+<pre id="sortie"></pre>
+
+<script>
+
+const GITHUB_OWNER = "TON_NOM_UTILISATEUR";
+const GITHUB_REPO = "verifications-db";
+const FILE_PATH = "data.json";
+const TOKEN = "ghp_xxxxxxxxxxxxxxxxxxxxx";
+
+/* =========================
+   LECTURE DU CLOUD
+========================= */
+async function chargerCloud() {
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
+
+  const response = await fetch(url, {
+    headers: {
+      "Authorization": `token ${TOKEN}`,
+      "Accept": "application/vnd.github+json"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Erreur GitHub: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  const contenuDecode = atob(data.content.replace(/\n/g, ""));
+  const json = JSON.parse(contenuDecode);
+
+  return {
+    json,
+    sha: data.sha
+  };
+}
+
+/* =========================
+   SAUVEGARDE CLOUD
+========================= */
 async function sauvegarderCloud(jsonData, sha) {
   const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${FILE_PATH}`;
 
   const contenu = btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2))));
 
   const body = {
-    message: "mise à jour data.json",
+    message: "update data.json",
     content: contenu,
     sha: sha
   };
@@ -25,6 +80,9 @@ async function sauvegarderCloud(jsonData, sha) {
   return await response.json();
 }
 
+/* =========================
+   AJOUT CLIENT
+========================= */
 async function ajouterClient(client) {
   const { json, sha } = await chargerCloud();
 
@@ -34,3 +92,53 @@ async function ajouterClient(client) {
 
   return json;
 }
+
+/* =========================
+   BOUTON CHARGER
+========================= */
+document.getElementById("btnCharger").addEventListener("click", async () => {
+  const sortie = document.getElementById("sortie");
+
+  try {
+    sortie.textContent = "Chargement...";
+
+    const resultat = await chargerCloud();
+
+    sortie.textContent = JSON.stringify(resultat.json, null, 2);
+
+  } catch (erreur) {
+    sortie.textContent = "Erreur : " + erreur.message;
+    console.error(erreur);
+  }
+});
+
+/* =========================
+   BOUTON AJOUT
+========================= */
+document.getElementById("btnAjouter").addEventListener("click", async () => {
+  const sortie = document.getElementById("sortie");
+
+  try {
+    sortie.textContent = "Ajout en cours...";
+
+    const client = {
+      id: Date.now().toString(),
+      nom: "Client Test",
+      adresse: "Montreal",
+      date: new Date().toISOString()
+    };
+
+    const resultat = await ajouterClient(client);
+
+    sortie.textContent = JSON.stringify(resultat, null, 2);
+
+  } catch (erreur) {
+    sortie.textContent = "Erreur : " + erreur.message;
+    console.error(erreur);
+  }
+});
+
+</script>
+
+</body>
+</html>
