@@ -24,3 +24,13 @@ async function sauvegarderCloud(jsonData, sha) {
 
   return await response.json();
 }
+
+async function ajouterClient(client) {
+  const { json, sha } = await chargerCloud();
+
+  json.clients.push(client);
+
+  await sauvegarderCloud(json, sha);
+
+  return json;
+}
